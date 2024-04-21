@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>测试-website</title>
+    <link href="/styles/base.css" rel="stylesheet" type="text/css">
+    <link href="/styles/regist.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="/js/plugins/jquery-form/jquery.form.js"></script>
+    <script src="/js/plugins/js-cookie/js.cookie.min.js"></script>
+    <script src="/js/vue/md5.js"></script>
+    <script type="text/javascript" src="/js/vue/common.js"></script>
+</head>
+<body>
+<script>
+    $(function () {
+
+        //需求： 发起一个请求，从后端(接口)获取当前登录用户信息
+        /*$.get(getServiceUrl("member") + "/userInfos/currentUser",{token:getToken()}, function (data){
+            console.log(data);
+        })*/
+
+
+
+        /**
+         * 项目二中展示前端请求约定：
+         * 1>后续请求所有请求使用ajaxGet-查  / ajaxPost-改
+         * 2>请求发起编写格式
+         *  ajaxGet(接口所在服务名，接口路径，接口参数，function(data){
+         *  })
+         *  ajaxPost(接口所在服务名，接口路径，接口参数，function(data){
+         *  })
+         * 3>如果请求不需要参数，也需要使用{} 占位
+         * 4>接口响应结束之后，处理响应逻辑不需要在进行data.code == 200判断，执行写逻辑即可
+         */
+        ajaxGet("member","/userInfos/currentUser",{aaa:1, bbb:222}, function (data){
+            console.log("111");
+            console.log(data);
+        })
+
+
+    })
+</script>
+</body>
+</html>
