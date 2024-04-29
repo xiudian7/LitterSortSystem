@@ -7,9 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="sort_common" />
-        <module name="sort_provider_api" />
+        <module name="sort-member-api" />
         <module name="sort_gateway" />
-        <module name="sort_provider_server" />
+        <module name="sort-member-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11" />
