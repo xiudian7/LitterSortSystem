@@ -1,4 +1,4 @@
-package cn.litterSortSystem.xiudian7.common.util.web.response;
+package cn.litterSortSystem.xiudian7.common.web.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,4 +46,3 @@ public class JsonResult<T> {
         return new JsonResult(CODE_NOLOGIN, MSG_NOLOGIN, null);
     }
 }
-

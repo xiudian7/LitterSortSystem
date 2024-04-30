@@ -1,4 +1,7 @@
 package cn.litterSortSystem.xiudian7.member.mapper;
 
-public interface UserInfoMapper {
+import cn.litterSortSystem.xiudian7.member.UserInfo;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface UserInfoMapper extends BaseMapper<UserInfo> {
 }
