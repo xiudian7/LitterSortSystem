@@ -1,4 +1,4 @@
-package cn.wolfcode.wolf2w.common.redis.service;
+package cn.litterSortSystem.xiudian7.common.redis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
