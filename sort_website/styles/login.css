@@ -79,12 +79,12 @@ a {
 }
 
 .container a.logo {
-    width: 136px;
-    height: 69px;
+    width: 300px;
+    height: 150px;
     display: block;
     text-indent: -999px;
     overflow: hidden;
-    background: url(../images/mfw-logo-white4.png) no-repeat;
+    background: url(../images/老鼠爱大米logo.png) no-repeat;
     margin: 0 auto;
 }
 .signup-forms {
@@ -143,9 +143,9 @@ a {
 .signup-forms .inner_v2 .inner_v2_right {
     float: right;
     border-left: 1px solid #ebebeb;
-    width: 208px;
+    width: 200px;
     padding-left: 20px;
-    height: 300px;
+    height: 350px;
     padding-top: 20px;
 }
 
