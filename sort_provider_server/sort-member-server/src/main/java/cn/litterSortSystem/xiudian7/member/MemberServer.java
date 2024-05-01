@@ -8,7 +8,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 
 @SpringBootApplication
-@MapperScan("cn.litterSortSystem.xiudian7.mapper")
+@MapperScan("cn.litterSortSystem.xiudian7.member.mapper")
 @EnableDiscoveryClient
 public class MemberServer {
 
