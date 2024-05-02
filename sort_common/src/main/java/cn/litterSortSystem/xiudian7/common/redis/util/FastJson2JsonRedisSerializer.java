@@ -1,4 +1,4 @@
-package cn.wolfcode.wolf2w.common.redis.util;
+package cn.litterSortSystem.xiudian7.common.redis.util;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONReader;
