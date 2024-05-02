@@ -9,9 +9,11 @@ import cn.litterSortSystem.xiudian7.member.mapper.UserInfoMapper;
 import cn.litterSortSystem.xiudian7.member.service.IUserInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,10 +24,12 @@ import static cn.litterSortSystem.xiudian7.common.util.Consts.VERIFY_CODE_VAI_TI
 @Service
 @Transactional
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements IUserInfoService {
-   private RedisService redisService;
+
+    @Autowired
+    private RedisService redisService;
     @Override
     //判断用户名是否唯一
-    public boolean checkUsername(String username) {
+    public boolean checkPhone(String username) {
         QueryWrapper<UserInfo> wrapper=new QueryWrapper<>();
         //LambdaQueryWrapper<UserInfo> lambdaQueryWrapper=new LambdaQueryWrapper<>();
         wrapper.eq("username",username);
@@ -59,7 +63,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         return map;
     }
     @Override
-    public void senVerifyCode(String username) {
+    public void sendVerifyCode(String username) {
         //创建验证码
         //设置六位的验证码
         String code=UUID.randomUUID().toString().replaceAll("-","").substring(0,6);
@@ -68,11 +72,26 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         sb.append("您注册的验证码是：").append(code).append(",请在").append(VERIFY_CODE_VAI_TIME).append("分钟之内使用！");
         //发送短信
         System.out.println(sb);
-        redisService.setCacheObject(username,code, RedisKeys.VERIFY_CODE.getTime(), TimeUnit.SECONDS);
+        String key=RedisKeys.VERIFY_CODE.join(username);
+        //把上面key打印下
+        //存入redis
+        //redisService.setCacheObject(key,code);
+
+        System.out.println(key);
+        System.out.println(RedisKeys.VERIFY_CODE.getTime());
+        System.out.println("redisservice is: "+redisService);
+        //这一句报错，也没把数据搞到redis里面
+        redisService.setCacheObject(key,code, RedisKeys.VERIFY_CODE.getTime(), TimeUnit.SECONDS);
+//        redisService.setCacheObject(key,"agxs");
     }
 
     @Override
     public void regist(String username, String password, String rpassword, int gender, String verifyCode) {
+        System.out.println(username);
+        System.out.println(password);
+        System.out.println(rpassword);
+        System.out.println(gender);
+        System.out.println(verifyCode);
         //判断参数不为空
         AssertUtil.hasText(username,"手机号不能为空！");
         AssertUtil.hasText(password,"密码不能为空！");
@@ -84,13 +103,13 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         if(!AssertUtil.validPhone(username))
             throw new LogicException("手机号码格式错误！");
         //判断手机号码是否唯一
-        if(this.checkUsername(username)){
+        if(this.checkPhone(username)){
             throw new LogicException("该手机号码已经被注册！");
         }
         //判断验证码是否一致
-        String code=redisService.getCacheObject(verifyCode);
+        String code=redisService.getCacheObject(username);
         if(verifyCode.equalsIgnoreCase(code)){
-            throw new LogicException("验证码时效或验证码不正确！");
+            throw new LogicException("验证码失效或验证码不正确！");
         }
         //用户注册
         UserInfo userInfo=new UserInfo();

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.litterSortSystem.xiudian7")//解决扫描不到RedisService问题
 @MapperScan("cn.litterSortSystem.xiudian7.member.mapper")
 @EnableDiscoveryClient
 public class MemberServer {

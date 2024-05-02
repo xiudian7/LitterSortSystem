@@ -25,14 +25,19 @@ public class UserInfoController {
         Map<String,Object> map=userInfoService.login(username,password);
         return JsonResult.success(map);
     }
+    @GetMapping("/checkPhone")
+    public JsonResult checkPhone(String phone){
+        boolean ret =userInfoService.checkPhone(phone);
+        return JsonResult.success(ret);
+    }
     @GetMapping("/sendVerifyCode")
     public JsonResult sendVerifyCode(String phone){
-        userInfoService.senVerifyCode(phone);
+        userInfoService.sendVerifyCode(phone);
         return JsonResult.success();
     }
     @PostMapping("/regist")
-    public JsonResult regist(String username,String password,String rpassword,int gender,String verifyCode){
-        userInfoService.regist(username,password,rpassword,gender,verifyCode);
+    public JsonResult regist(String phone,String password,String rpassword,int gender,String verifyCode){
+        userInfoService.regist(phone,password,rpassword,gender,verifyCode);
         return JsonResult.success();
     }
 }

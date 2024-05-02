@@ -7,10 +7,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.Map;
 
 public interface IUserInfoService  extends IService<UserInfo> {
-    boolean checkUsername(String username);
+    boolean checkPhone(String username);
     Map<String, Object> login(String username, String password);
 
     void regist(String username, String password, String rpassword, int gender, String verifyCode);
 
-    void senVerifyCode(String phone);
+    void sendVerifyCode(String phone);
 }
