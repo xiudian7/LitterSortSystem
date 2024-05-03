@@ -53,6 +53,7 @@ var vue = new Vue({
 
                 var phone = $("#phone").val();
                 $.get(getServiceUrl("member") + "/userInfos/sendVerifyCode", {phone:phone}, function (data) {
+                    console.log(data);
                     if(data.code == 200){
                         popup("发送成功")
                     }else{
