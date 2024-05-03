@@ -5,10 +5,7 @@ package cn.litterSortSystem.xiudian7.member.web.controller;
 import cn.litterSortSystem.xiudian7.common.web.response.JsonResult;
 import cn.litterSortSystem.xiudian7.member.service.IUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 

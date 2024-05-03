@@ -12,8 +12,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,6 +25,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Autowired
     private RedisService redisService;
+
     @Override
     //判断用户名是否唯一
     public boolean checkPhone(String username) {
@@ -52,14 +51,18 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         wrapper.eq("username",username);
         wrapper.eq("password",password);
         UserInfo user = super.getOne(wrapper);
-        if(user==null)
-        throw new LogicException("账号或者密码错误！");
+        if(user == null){
+            throw new LogicException("账号或者密码错误！");
+        }
         //设置token返回前端
         String token= UUID.randomUUID().toString();
+        //以token为key user为value存入redis中，时效为三十分钟
+        String key =RedisKeys.USER_LOGIN_TOKEN.join(token);
+        //将user对象转成json格式的字符串，使用redis的String类型缓存--偏重查一些
+        redisService.setCacheObject(key,user,RedisKeys.VERIFY_CODE.getTime(),TimeUnit.SECONDS);
         Map<String,Object>map=new HashMap<>();
         map.put("token",token);
         map.put("user",user);
-        System.out.println("前端得到的数据为：token:"+token+"+user:"+user);
         return map;
     }
     @Override
