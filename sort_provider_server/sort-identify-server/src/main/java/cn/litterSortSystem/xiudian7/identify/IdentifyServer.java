@@ -2,28 +2,24 @@ package cn.litterSortSystem.xiudian7.identify;
 
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.python.core.PyString;
-import org.python.util.PythonInterpreter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
+
 
 @SpringBootApplication(scanBasePackages = "cn.litterSortSystem.xiudian7")
 @MapperScan("cn.litterSortSystem.xiudian7.identify.mapper")
 @EnableDiscoveryClient
 public class IdentifyServer {
     public static void main(String[] args) {
-        System.out.println("当前 Java 程序的工作目录：" + System.getProperty("user.dir"));
+       /* System.out.println("当前 Java 程序的工作目录：" + System.getProperty("user.dir"));
         Process proc;
         StringBuilder pythonOutput = new StringBuilder(); // 用于存储Python脚本的输出结果
         try {
-            proc = Runtime.getRuntime().exec("D:\\CodePractice\\anaconda\\envs\\pytorch python.exe model_code/main.py");
+            proc = Runtime.getRuntime().exec("D:\\CodePractice\\anaconda\\envs\\pytorch\\python.exe model_code/main.py");
 
             BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             BufferedReader err = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
@@ -52,7 +48,7 @@ public class IdentifyServer {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         SpringApplication.run(IdentifyServer.class,args);
     }
