@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from produce import predict
 def main():
     imagePath = "./paper162.jpg" # 测试路径

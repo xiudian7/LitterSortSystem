@@ -8,7 +8,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="sort_common" />
+        <module name="sort-identify-server" />
         <module name="sort-member-api" />
+        <module name="sort-identify-api" />
         <module name="sort_gateway" />
         <module name="sort-member-server" />
       </profile>

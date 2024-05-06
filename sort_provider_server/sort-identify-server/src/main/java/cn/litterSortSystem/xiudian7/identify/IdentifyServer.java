@@ -8,7 +8,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 @SpringBootApplication(scanBasePackages = "cn.litterSortSystem.xiudian7")
@@ -16,36 +19,42 @@ import java.net.URISyntaxException;
 @EnableDiscoveryClient
 public class IdentifyServer {
     public static void main(String[] args) {
-        // 获取 Jython 的 jar 文件路径
-        String jythonJarPath = getJythonJarPath();
+        System.out.println("当前 Java 程序的工作目录：" + System.getProperty("user.dir"));
+        Process proc;
+        StringBuilder pythonOutput = new StringBuilder(); // 用于存储Python脚本的输出结果
+        try {
+            proc = Runtime.getRuntime().exec("D:\\CodePractice\\anaconda\\envs\\pytorch python.exe model_code/main.py");
 
-        // 如果找到了 Jython 的 jar 文件路径，则执行 Python 代码
-        if (jythonJarPath != null) {
-            // 设置 Python 脚本路径
-            String pythonScriptPath = "D:/CodePractice/litter_sort_system/model_code/main.py";
-            // 设置图片路径
-            String imagePath = "./paper162.jpg";
+            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            BufferedReader err = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-            // 创建 Python 解释器
-            PythonInterpreter interpreter = new PythonInterpreter();
+            // 处理标准输出流
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+                pythonOutput.append(line).append("\n");
+            }
 
-            // 将图片地址传递给 Python 程序
-            interpreter.set("imagePath", new PyString(imagePath));
+            // 处理错误输出流
+            while ((line = err.readLine()) != null) {
+                System.err.println(line);
+            }
 
-            // 执行 Python 代码
-            interpreter.execfile(pythonScriptPath);
+            in.close();
+            err.close();
+
+            proc.waitFor();
+
+            // 输出Python脚本的输出结果到控制台
+            System.out.println("Python脚本的输出结果：");
+            System.out.println(pythonOutput.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         SpringApplication.run(IdentifyServer.class,args);
     }
 
-    private static String getJythonJarPath() {
-        try {
-            File jarFile = new File(IdentifyServer.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            return jarFile.getParentFile().getAbsolutePath() + File.separator + "jython-standalone-2.7.0.jar";
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
