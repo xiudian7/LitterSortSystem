@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
 from torchvision import models
@@ -24,7 +23,7 @@ def predict(image_path):
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 6)  # 输出层6个类别，与保存时相同
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.load_state_dict(torch.load("trash_classification_model.pth", map_location=device))
+    model.load_state_dict(torch.load("model_code/trash_classification_model.pth", map_location=device))
     model = model.to(device)
 
     # 模型预测
