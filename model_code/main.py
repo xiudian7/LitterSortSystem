@@ -1,6 +1,6 @@
 from produce import predict
 def main():
-    imagePath = "./paper162.jpg" # 测试路径
+    imagePath = "model_code/paper162.jpg" # 测试路径
     result = predict(imagePath)
     print(result)
     return result
