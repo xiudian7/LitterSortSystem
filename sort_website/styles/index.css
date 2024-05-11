@@ -219,7 +219,7 @@ a:hover {
 }
 
 .searchbar {
-    height: 46px;
+    height: 80px;
     overflow: hidden;
 }
 
@@ -260,7 +260,7 @@ a:hover {
     text-align: center;
 }
 
-.search-group .icon-search {
+.search-group .icon-identify {
     display: inline-block;
     margin-top: 11px;
     width: 24px;
@@ -1061,7 +1061,17 @@ a:hover {
     .search-group .search-button a {
         height: 36px;
     }
-    .search-group .icon-search {
+    /*.search-group .icon-search {
         margin-top: 6px;
+    }*/
+    .search-group .icon-search {
+        display: inline-block;
+        margin-top: 11px;
+        width: 24px;
+        height: 24px;
+        background-image: url(../images/老鼠爱大米logo.png);
+        background-position: 0 -110px!important;
+        overflow: hidden;
+        vertical-align: top;
     }
 }

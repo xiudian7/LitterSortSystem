@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from produce import predict
+import sys
 def main():
-    imagePath = "model_code/paper162.jpg" # 测试路径
+    path=sys.argv[1]
+    print(path)
+    imagePath = "model_code/images/"+path # 测试路径
     result = predict(imagePath)
     print(result)
     return result

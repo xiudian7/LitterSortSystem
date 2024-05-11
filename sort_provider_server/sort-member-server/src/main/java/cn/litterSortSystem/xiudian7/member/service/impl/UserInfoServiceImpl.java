@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -86,6 +88,22 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         //这一句报错，也没把数据搞到redis里面
         redisService.setCacheObject(key,code, RedisKeys.VERIFY_CODE.getTime(), TimeUnit.SECONDS);
 //        redisService.setCacheObject(key,"agxs");
+    }
+
+    @Override
+    public UserInfo getByToken(String token) {
+        if(!StringUtils.hasText(token)){
+            return null;
+        }
+        String key=RedisKeys.USER_LOGIN_TOKEN.join(token);
+
+        if(redisService.hasKey(key)){
+            UserInfo userInfo=redisService.getCacheObject(key);
+            //在此处重置时间30分钟
+            redisService.expire(key,RedisKeys.USER_LOGIN_TOKEN.getTime(),TimeUnit.SECONDS);
+            return userInfo;
+        }
+        return null;
     }
 
     @Override

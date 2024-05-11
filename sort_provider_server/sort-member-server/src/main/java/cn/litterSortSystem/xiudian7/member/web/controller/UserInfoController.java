@@ -3,10 +3,12 @@ package cn.litterSortSystem.xiudian7.member.web.controller;
 
 
 import cn.litterSortSystem.xiudian7.common.web.response.JsonResult;
+import cn.litterSortSystem.xiudian7.member.UserInfo;
 import cn.litterSortSystem.xiudian7.member.service.IUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
@@ -36,5 +38,14 @@ public class UserInfoController {
     public JsonResult regist(String phone,String password,String rpassword,int gender,String verifyCode){
         userInfoService.regist(phone,password,rpassword,gender,verifyCode);
         return JsonResult.success();
+    }
+    @GetMapping("/currentUser")
+    public JsonResult currentUser(HttpServletRequest request){
+        String token = request.getHeader("token");
+        System.out.println(request.getCookies());
+        System.out.println(request.getRequestURI());
+        System.out.println(request.getMethod());
+        UserInfo userInfo=userInfoService.getByToken(token);
+        return JsonResult.success(userInfo);
     }
 }

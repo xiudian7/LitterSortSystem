@@ -14,8 +14,7 @@ public class IdentifyController {
     @Autowired
     private IdentifyService identifyService;
     @PostMapping("/identify")
-    public JsonResult identify(@RequestParam("file")MultipartFile file){
-        System.out.println(file);
+    public JsonResult identify(String token, String user, String file){
         String identify = identifyService.identify(file);
         return JsonResult.success(identify);
     }
