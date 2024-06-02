@@ -48,6 +48,10 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         //手机号码格式正确
         if(!AssertUtil.validPhone(username))
             throw new LogicException("用户名格式错误！");
+        System.out.println(checkPhone(username));
+        if(checkPhone(username)==false){
+            throw new LogicException("账号不存在！");
+        }
         //查询账号密码是否存在
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("username",username);
@@ -118,6 +122,20 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         AssertUtil.hasText(password,"密码不能为空！");
         AssertUtil.hasText(rpassword,"密码确认不能为空！");
         AssertUtil.hasText(verifyCode,"验证码不能为空！");
+        //判断密码强度
+        if(password.length()<8||password.length()>16)
+            throw new LogicException("密码长度必须在8-16位");
+        // 检查是否包含至少一个大写字母
+        boolean hasUppercase = false;
+        for (int i = 0; i < password.length(); i++) {
+            if (Character.isUpperCase(password.charAt(i))) {
+                hasUppercase = true;
+                break;
+            }
+        }
+        if (!hasUppercase) {
+            throw new LogicException("密码必须包含至少一个大写字母");
+        }
         //判断两次密码是否一致
         AssertUtil.isEquals(password,rpassword,"两次密码不一致！");
         //手机格式是否正确
