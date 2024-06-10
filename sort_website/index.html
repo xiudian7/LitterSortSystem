@@ -25,30 +25,20 @@
     </script>
 </div>
 
-        <div class="search-container" id="_j_index_search">
+        <!--<div class="search-container" id="_j_index_search">
             <div class="search-group">
-                <!--<div class="searchtab" id="_j_index_search_tab">
-                    <ul class="clearfix">
-                        <li class="tab-selected" data-index="-1"><i></i>全部</li>
-                        <li data-index="0"><i></i>目的地</li>
-                        <li data-index="1"><i></i>攻略</li>
-                        <li data-index="2"><i></i>游记</li>
-                        <li data-index="3"><i></i>找人</li>
-                    </ul>
-                </div>-->
                 <div class="searchbar" id="_j_index_search_bar_all">
-                    <div class="search-wrapper">
-                        <div class="search-input">
-                            <input name="image" type="file" placeholder="请选择文件" id="upload-image-input" autocomplete="off">
-                        </div>
-                    </div>
                     <div class="search-button" id="_j_index_search_btn_all">
                         <a role="button" href="javascript:" @click="identifyClick"><i class="icon-search"></i></a>
                     </div>
                 </div>
 
             </div>
-        </div>
+        </div>-->
+<div class="frame">
+    <button class="custom-btn btn-9" @click="identifyClick">点我分类！</button>
+</div>
+
 </body>
 <!--<script src="./js/vue/system/index/index.js"></script>-->
 <script>
@@ -74,20 +64,13 @@
                 }
                 return "";
             },*/
+            //点击按钮就直接调用后端
             identifyClick:function () {
                 console.log('执行click')
-                const inputDom = document.getElementById('upload-image-input')
-                const file = inputDom.files[0]
-                console.log('input上传的文件：', file)
                 const formData = new FormData()
                 console.log('user', user)
                 formData.append('token', token)
                 formData.append('user', JSON.stringify(user))
-                const reader = new FileReader()
-                reader.readAsDataURL(file)
-                reader.onload = ()=>{
-                    const base64 = reader.result
-                    formData.append('file', base64)
                     fetch("http://localhost:8082/functions/identify", {
                         method: "POST",
                         headers:{
@@ -112,9 +95,6 @@
                             }
 
                         });
-
-                }
-
             }},
         mounted:function () {
         }
