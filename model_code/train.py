@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
 from torchvision import transforms, models
+from torch.utils.data import DataLoader
 from PIL import Image
 import pandas as pd
-import matplotlib.pyplot as plt
-
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import joblib
 
 # 定义数据集类
 class TrashDataset(torch.utils.data.Dataset):
@@ -27,7 +28,6 @@ class TrashDataset(torch.utils.data.Dataset):
         if self.transform:
             image = self.transform(image)
         return image, label
-
 
 # 数据转换
 transform = transforms.Compose([
@@ -52,71 +52,89 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-# 定义模型
+print("数据加载完成")
+
+# 定义特征提取器
+class FeatureExtractor(nn.Module):
+    def __init__(self, model):
+        super(FeatureExtractor, self).__init__()
+        self.features = nn.Sequential(*list(model.children())[:-1])
+
+    def forward(self, x):
+        x = self.features(x)
+        x = torch.flatten(x, 1)
+        return x
+
+# 使用预训练的ResNet18
 model = models.resnet18(pretrained=True)
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 6)  # 输出层6个类别
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
+feature_extractor = FeatureExtractor(model)
+feature_extractor.eval()
 
-# 定义损失函数和优化器
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+# 使用GPU
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+feature_extractor = feature_extractor.to(device)
 
-# 训练模型
-num_epochs = 10
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0
-    for inputs, labels in train_loader:
-        inputs, labels = inputs.to(device), labels.to(device)
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item() * inputs.size(0)
-    epoch_loss = running_loss / len(train_dataset)
-    print(f"Epoch {epoch + 1}/{num_epochs} Training Loss: {epoch_loss:.4f}")
+print("特征提取器加载完成")
 
-    # 在验证集上评估模型
-    model.eval()
-    val_correct = 0
-    val_total = 0
+# 将数据集加载到特征提取器中
+def extract_features(data_loader):
+    features = []
+    labels = []
     with torch.no_grad():
-        for inputs, labels in val_loader:
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs = model(inputs)
-            _, predicted = torch.max(outputs, 1)
-            val_correct += (predicted == labels).sum().item()
-            val_total += labels.size(0)
-    val_accuracy = val_correct / val_total
-    print(f"Epoch {epoch + 1}/{num_epochs} Validation Accuracy: {val_accuracy:.4f}")
+        for images, label in data_loader:
+            images = images.to(device)
+            output = feature_extractor(images)
+            features.append(output.cpu().numpy())
+            labels.append(label.numpy())
+    features = np.vstack(features)
+    labels = np.concatenate(labels)
+    return features, labels
 
-# 保存训练的模型
-torch.save(model.state_dict(), "trash_classification_model.pth")
-print("Model Saved")
+# 定义训练和验证函数
+def train_and_evaluate(epochs):
+    best_val_accuracy = 0.0
+    for epoch in range(epochs):
+        print(f"Epoch {epoch + 1}/{epochs}")
 
-# 在测试集上评估模型并展示图片预测结果
-model.eval()
-test_correct = 0
-test_total = 0
-with torch.no_grad():
-    for inputs, labels in test_loader:
-        inputs, labels = inputs.to(device), labels.to(device)
-        outputs = model(inputs)
-        _, predicted = torch.max(outputs, 1)
-        test_correct += (predicted == labels).sum().item()
-        test_total += labels.size(0)
+        # 提取训练、验证和测试集的特征
+        print("开始提取训练集特征...")
+        train_features, train_labels = extract_features(train_loader)
+        print("训练集特征提取完成")
 
-        # 展示部分图片的预测结果
-        for i in range(10):
-            image = inputs[i].cpu().numpy().transpose((1, 2, 0))  # 将图片从 Tensor 转为 NumPy 数组，并转置通道
-            label = labels[i].cpu().item()
-            pred = predicted[i].cpu().item()
-            plt.imshow(image)
-            plt.title(f"True: {label}, Predicted: {pred}")
-            plt.show()
+        print("开始提取验证集特征...")
+        val_features, val_labels = extract_features(val_loader)
+        print("验证集特征提取完成")
 
-test_accuracy = test_correct / test_total
-print(f"Test Accuracy: {test_accuracy:.4f}")
+        print("开始提取测试集特征...")
+        test_features, test_labels = extract_features(test_loader)
+        print("测试集特征提取完成")
+
+        # 训练随机森林分类器
+        print("开始训练随机森林分类器...")
+        random_forest = RandomForestClassifier(n_estimators=100)
+        random_forest.fit(train_features, train_labels)
+        print("随机森林分类器训练完成")
+
+        # 验证随机森林分类器
+        print("开始验证随机森林分类器...")
+        val_preds_rf = random_forest.predict(val_features)
+        val_accuracy_rf = accuracy_score(val_labels, val_preds_rf)
+        print(f"随机森林验证集准确率: {val_accuracy_rf * 100:.2f}%")
+
+        if val_accuracy_rf > best_val_accuracy:
+            best_val_accuracy = val_accuracy_rf
+            best_random_forest = random_forest
+
+    # 保存最好的随机森林分类器
+    joblib.dump(best_random_forest, 'best_random_forest.pkl')
+    print("最好的随机森林分类器已保存")
+
+    # 测试最好的随机森林分类器
+    print("开始测试最好的随机森林分类器...")
+    test_preds_rf = best_random_forest.predict(test_features)
+    test_accuracy_rf = accuracy_score(test_labels, test_preds_rf)
+    print(f"随机森林测试集准确率: {test_accuracy_rf * 100:.2f}%")
+
+# 训练和评估模型
+epochs = 5
+train_and_evaluate(epochs)
