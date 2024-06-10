@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -16,17 +17,10 @@ import java.util.UUID;
 public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>implements IdentifyService {
 
     @Override
-    public String identify(String file) {
+    public String identify() {
         String substring = UUID.randomUUID().toString().substring(0, 6);
-        //System.out.println(substring);
         String imagePath="D:\\CodePractice\\litter_sort_system\\model_code\\images\\"+substring+".jpg";
-        String s = generateImage(file, imagePath);
-       //System.out.println(s);
-        /*try{
-            FileOutputStream fos=new FileOutputStream("D:\\CodePractice\\litter_sort_system\\model_code\\images\\"+imagePath+".jpg");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }*/
+        takePhoto(imagePath);
         int i = identifyResult(substring+".jpg");
         //数字标识：class_labels = ["glass", "paper", "cardboard", "plastic", "metal", "trash"]
         String []information={"玻璃","纸张","纸皮","塑料","金属","废料"};
@@ -58,6 +52,48 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
             return imagePath;
         } catch (IOException e) {
             return null;
+        }
+    }
+
+
+//将树莓派拍摄图片所存放的地址传进来，进行获取图片
+    @Override
+    public void takePhoto(String filePath) {
+        // 配置连接参数
+        final String ip = "192.168.16.193";
+        final int port = 4567;
+        // 获取当前工作目录
+        String workingDirectory = System.getProperty("user.dir");
+        // 打印工作目录
+        System.out.println("当前工作目录: " + workingDirectory);
+        // 创建文件并加载流
+        File file = new File(filePath);
+        if(!file.exists()) {
+            try {
+                if (file.createNewFile()) {
+                    System.out.println("文件已创建: " + filePath);
+                } else {
+                    System.out.println("文件创建失败: " + filePath);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try(Socket socket = new Socket(ip, port);
+            FileOutputStream fos=new FileOutputStream(filePath)
+        ) {
+            System.out.println("已连接到服务器端口，准备接收图片...");
+
+            InputStream inputStream = socket.getInputStream();
+            // 定义缓存数组，每次只读1024字节
+            byte[] buf = new byte[1024];
+            int len = 0;
+            while((len = inputStream.read(buf)) != -1) {
+                fos.write(buf, 0, len);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
