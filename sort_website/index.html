@@ -15,6 +15,92 @@
     <script type="text/javascript" src="/js/system/index/index.js"></script>
     <script src="./js/vue/vue.min.js"></script>
     <script src="/js/vue/system/index/index.js"></script>
+    <style>
+        button {
+            margin: 20px;
+        }
+        .frame{
+            height: 100vh;
+            width: 100%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+        }
+        .custom-btn {
+            width: 130px;
+            height: 40px;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px 25px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 500;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: inline-block;
+            box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+            7px 7px 20px 0px rgba(0, 0, 0, .1),
+            4px 4px 5px 0px rgba(0, 0, 0, .1);
+            outline: none;
+        }
+        /* 9 */
+        .btn-9 {
+            border: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .btn-9:after {
+            position: absolute;
+            content: " ";
+            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1fd1f9;
+            background-image: linear-gradient(315deg, #1fd1f9 0%, #b621fe 74%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-9:hover {
+            background: transparent;
+            box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, .5),
+            -4px -4px 6px 0 rgba(116, 125, 136, .2),
+            inset -4px -4px 6px 0 rgba(255, 255, 255, .5),
+            inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+            color: #fff;
+        }
+
+        .btn-9:hover:after {
+            -webkit-transform: scale(2) rotate(180deg);
+            transform: scale(2) rotate(180deg);
+            box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, .5),
+            -4px -4px 6px 0 rgba(116, 125, 136, .2),
+            inset -4px -4px 6px 0 rgba(255, 255, 255, .5),
+            inset 4px 4px 6px 0 rgba(116, 125, 136, .3);
+        }
+    .loading {
+        width: 100px;
+        height: 100px;
+        background: url("../images/loading.png") no-repeat;
+        background-size: 100% 100%;
+        display: none;
+        animation: rotating 3s infinite linear;
+    }
+        @keyframes rotating {
+            0% {
+                transform: rotate(0deg) /*动画起始位置为旋转0度*/
+            }
+
+            to {
+                transform: rotate(1turn) /*动画结束位置为旋转1圈*/
+            }
+        }
+
+    </style>
 </head>
 <body>
 <div id="navbar">
@@ -37,69 +123,110 @@
         </div>-->
 <div class="frame">
     <button class="custom-btn btn-9" @click="identifyClick">点我分类！</button>
+    <div class="loading"></div>
 </div>
 
 </body>
 <!--<script src="./js/vue/system/index/index.js"></script>-->
 <script>
-    var vue = new Vue({
-        el:".search-container",
-        data:{
-            page:{},
-            // day:getIndexTime(),
-            banners:[],
-            page:{},
-            stBanner:{}
-        },
-        methods:{
-             /*getCookie:function (name){
-                var strcookie = document.cookie;//获取cookie字符串
-                var arrcookie = strcookie.split("; ");//分割
-                //遍历匹配
-                for ( var i = 0; i < arrcookie.length; i++) {
-                    var arr = arrcookie[i].split("=");
-                    if (arr[0] == name){
-                        return arr[1];
-                    }
+    $('.btn-9').click(function (){
+        console.log(1111)
+        console.log('执行click')
+        const formData = new FormData()
+        $('.btn-9').hide()
+        $('.loading').show()
+        console.log('user', user)
+        formData.append('token', token)
+        formData.append('user', JSON.stringify(user))
+        fetch("http://localhost:8082/functions/identify", {
+            method: "POST",
+            headers:{
+                "token":getToken()
+            },
+            body: formData
+        })
+            .then(response => {
+                $('.btn-9').show()
+                $('.loading').hide()
+                if (!response.ok) {
+                    throw new Error('网络错误，请稍后再试！');
                 }
-                return "";
-            },*/
-            //点击按钮就直接调用后端
-            identifyClick:function () {
-                console.log('执行click')
-                const formData = new FormData()
-                console.log('user', user)
-                formData.append('token', token)
-                formData.append('user', JSON.stringify(user))
-                    fetch("http://localhost:8082/functions/identify", {
-                        method: "POST",
-                        headers:{
-                            "token":getToken()
-                        },
-                        body: formData
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('网络错误，请稍后再试！');
-                            }
-                            return response.json(); // 解析后端返回的JSON数据
-                        })
-                        .then(data => {
-                            // 输出后端返回的data值
-                            if(data.code == 200){
-                                console.log('后端返回的data值：', data);
-                                popup("垃圾类型为："+data.data)
-                            }
-                            else{
-                                popup(data.msg)
-                            }
+                return response.json(); // 解析后端返回的JSON数据
+            })
+            .then(data => {
+                // 输出后端返回的data值
+                if(data.code == 200){
+                    console.log('后端返回的data值：', data);
+                    popup("垃圾类型为："+data.data)
+                }
+                else{
+                    popup(data.msg)
+                }
 
-                        });
-            }},
-        mounted:function () {
-        }
-    });
-
-    console.log('vue', vue)
+            });
+    })
+    // var vue = new Vue({
+    //     el:".search-container",
+    //     data:{
+    //         page:{},
+    //         // day:getIndexTime(),
+    //         banners:[],
+    //         page:{},
+    //         stBanner:{}
+    //     },
+    //     methods:{
+    //          /*getCookie:function (name){
+    //             var strcookie = document.cookie;//获取cookie字符串
+    //             var arrcookie = strcookie.split("; ");//分割
+    //             //遍历匹配
+    //             for ( var i = 0; i < arrcookie.length; i++) {
+    //                 var arr = arrcookie[i].split("=");
+    //                 if (arr[0] == name){
+    //                     return arr[1];
+    //                 }
+    //             }
+    //             return "";
+    //         },*/
+    //         //点击按钮就直接调用后端
+    //         identifyClick:function () {
+    //             console.log('执行click')
+    //             const formData = new FormData()
+    //             $('.btn-9').hide()
+    //             $('.loading').show()
+    //             console.log('user', user)
+    //             formData.append('token', token)
+    //             formData.append('user', JSON.stringify(user))
+    //                 fetch("http://localhost:8082/functions/identify", {
+    //                     method: "POST",
+    //                     headers:{
+    //                         "token":getToken()
+    //                     },
+    //                     body: formData
+    //                 })
+    //                     .then(response => {
+    //                         $('.btn-9').show()
+    //                         $('.loading').hide()
+    //                         if (!response.ok) {
+    //                             throw new Error('网络错误，请稍后再试！');
+    //                         }
+    //                         return response.json(); // 解析后端返回的JSON数据
+    //                     })
+    //                     .then(data => {
+    //                         // 输出后端返回的data值
+    //                         if(data.code == 200){
+    //                             console.log('后端返回的data值：', data);
+    //                             popup("垃圾类型为："+data.data)
+    //                         }
+    //                         else{
+    //                             popup(data.msg)
+    //                         }
+    //
+    //                     });
+    //         }},
+    //     mounted:function () {
+    //     }
+    // });
+    //
+    // console.log('vue', vue)
 </script>
 </html>
