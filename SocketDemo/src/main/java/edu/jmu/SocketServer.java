@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 public class SocketServer {
@@ -13,9 +14,10 @@ public class SocketServer {
 
     // 执行拍照，返回图片路径
     public static String getPhoto() throws IOException, InterruptedException {
-        Process process = Runtime.getRuntime().exec("ffmpeg -i /dev/video0 -frames:v 1 -f image2 output.jpg");
+        String substring = UUID.randomUUID().toString().substring(0, 6);
+        Process process = Runtime.getRuntime().exec("ffmpeg -i /dev/video0 -frames:v 1 -f image2 "+substring+".jpg");
         process.waitFor(); //等待拍照完成
-        return "/home/xiudian/mouseMice/output.jpg";
+        return "/home/xiudian/mouseMice/"+substring+".jpg";
     }
 
     // 发送图片
