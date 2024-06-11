@@ -13,4 +13,6 @@ public interface IUserInfoService  extends IService<UserInfo> {
     void regist(String username, String password, String rpassword, int gender, String verifyCode);
 
     void sendVerifyCode(String phone);
+
+    UserInfo getByToken(String token);
 }

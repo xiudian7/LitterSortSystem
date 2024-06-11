@@ -1,13 +1,31 @@
 package cn.litterSortSystem.xiudian7.member.web.config;
 
 
+import cn.litterSortSystem.xiudian7.common.sercurity.interceptor.CheckLoginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    //创建对象交给spring容器管理
+    @Bean
+    public CheckLoginInterceptor checkLoginInterceptor(){
+        return new CheckLoginInterceptor();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(checkLoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/userInfos/checkPhone")
+                .excludePathPatterns("/userInfos/login")
+                .excludePathPatterns("/userInfos/sendVerifyCode")
+                .excludePathPatterns("/userInfos/regist");
+    }
+
     //跨域访问
     @Bean
     public WebMvcConfigurer corsConfigurer() {

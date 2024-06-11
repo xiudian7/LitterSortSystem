@@ -66,7 +66,11 @@ var vue = new Vue({
         regist:function (){
             $.post(getServiceUrl("member") + "/userInfos/regist", $("#editForm").serialize(), function (data) {
                 if(data.code == 200){
-                    location.href = "/login.html";
+                    //location.href = "/login.html";
+                    popup("注册成功！即将跳转登入界面！");
+                    setTimeout(function() {
+                        location.href = "/login.html";
+                    }, 3000); // 3000 milliseconds = 3 seconds
                 }else{
                     popup(data.msg);
                 }

@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +48,10 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         //手机号码格式正确
         if(!AssertUtil.validPhone(username))
             throw new LogicException("用户名格式错误！");
+        System.out.println(checkPhone(username));
+        if(checkPhone(username)==false){
+            throw new LogicException("账号不存在！");
+        }
         //查询账号密码是否存在
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("username",username);
@@ -89,6 +95,22 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     }
 
     @Override
+    public UserInfo getByToken(String token) {
+        if(!StringUtils.hasText(token)){
+            return null;
+        }
+        String key=RedisKeys.USER_LOGIN_TOKEN.join(token);
+
+        if(redisService.hasKey(key)){
+            UserInfo userInfo=redisService.getCacheObject(key);
+            //在此处重置时间30分钟
+            redisService.expire(key,RedisKeys.USER_LOGIN_TOKEN.getTime(),TimeUnit.SECONDS);
+            return userInfo;
+        }
+        return null;
+    }
+
+    @Override
     public void regist(String username, String password, String rpassword, int gender, String verifyCode) {
         System.out.println(username);
         System.out.println(password);
@@ -100,6 +122,20 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         AssertUtil.hasText(password,"密码不能为空！");
         AssertUtil.hasText(rpassword,"密码确认不能为空！");
         AssertUtil.hasText(verifyCode,"验证码不能为空！");
+        //判断密码强度
+        if(password.length()<8||password.length()>16)
+            throw new LogicException("密码长度必须在8-16位");
+        // 检查是否包含至少一个大写字母
+        boolean hasUppercase = false;
+        for (int i = 0; i < password.length(); i++) {
+            if (Character.isUpperCase(password.charAt(i))) {
+                hasUppercase = true;
+                break;
+            }
+        }
+        if (!hasUppercase) {
+            throw new LogicException("密码必须包含至少一个大写字母");
+        }
         //判断两次密码是否一致
         AssertUtil.isEquals(password,rpassword,"两次密码不一致！");
         //手机格式是否正确

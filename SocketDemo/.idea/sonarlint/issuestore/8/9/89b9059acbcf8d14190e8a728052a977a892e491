@@ -1,0 +1,12 @@
+
+T
+java:S1854"7Remove this useless assignment to local variable "fis".(š‡ýœ8¥¼™†ÿ1
+c
+java:S1854"HRemove this useless assignment to local variable "bufferedOutputStream".(í«r8µ¼™†ÿ1
+G	java:S106"+Replace this use of System.out by a logger.(åÒ¡ü8Å¼™†ÿ1
+T
+java:S1481"9Remove this unused "bufferedOutputStream" local variable.(í«r8Ö¼™†ÿ1
+E
+java:S1481"(Remove this unused "fis" local variable.(š‡ýœ8×¼™†ÿ1
+[
+java:S4719"9Replace charset name argument with StandardCharsets.UTF_8(å‹Ö‚úÿÿÿÿ8Ø¼™†ÿ1

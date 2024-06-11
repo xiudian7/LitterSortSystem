@@ -10,6 +10,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>sort-member-server</module>
+        <module>sort-identify-server</module>
+
+
     </modules>
 
     <properties>
@@ -50,6 +53,8 @@
             <artifactId>sort_common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+
 
     </dependencies>
 
