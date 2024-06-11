@@ -12,7 +12,7 @@ import java.net.Socket;
 public class SockerClient {
     public static void main(String[] args) {
         // 配置连接参数
-        final String ip = "192.168.79.193";
+        final String ip = "192.168.60.193";
         final int port = 4567;
         // 获取当前工作目录
         String workingDirectory = System.getProperty("user.dir");

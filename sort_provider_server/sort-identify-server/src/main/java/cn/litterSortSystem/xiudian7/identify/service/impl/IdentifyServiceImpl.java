@@ -1,5 +1,6 @@
 package cn.litterSortSystem.xiudian7.identify.service.impl;
 
+import cn.litterSortSystem.xiudian7.common.exception.LogicException;
 import cn.litterSortSystem.xiudian7.identify.ImageInfo;
 import cn.litterSortSystem.xiudian7.identify.mapper.IdentifyMapper;
 import cn.litterSortSystem.xiudian7.identify.service.IdentifyService;
@@ -28,6 +29,8 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
         int res=sendIdentifyMsg("images/"+substring+".jpg");
         //int i = identifyResult(substring+".jpg");
         //数字标识：class_labels = ["glass", "paper", "cardboard", "plastic", "metal", "trash"]
+        if(res==-1)
+        throw new LogicException("未能识别出垃圾!");
         String []information={"玻璃","纸张","纸皮","塑料","金属","废料"};
         System.out.println(information[res]);
         return information[res];
@@ -65,7 +68,7 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
     @Override
     public void takePhoto(String filePath) {
         // 配置连接参数
-        final String ip = "192.168.60.193";
+        final String ip = "192.168.139.193";
         final int port = 4567;
         // 获取当前工作目录
         String workingDirectory = System.getProperty("user.dir");
