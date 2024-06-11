@@ -37,9 +37,9 @@ Traditional manual waste sorting techniques suffer from low efficiency, long pro
 
 ### 机器学习
 
-- **TensorFlow**: 机器学习框架，用于训练垃圾分类模型。
-- **Keras**: 高级神经网络 API，简化深度学习模型的构建和训练。
-- **OpenCV**: 计算机视觉库，用于图像处理和特征提取。
+- **Pytorch**: 机器学习框架，用于训练垃圾分类模型。
+- **Resnet18**: 基于卷积神经网络实现，提取图像特征
+- **随机森林**: 分类器，实现图像分类
 
 ### 树莓派
 
