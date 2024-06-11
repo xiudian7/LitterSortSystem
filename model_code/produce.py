@@ -1,11 +1,9 @@
-import argparse
 import torch
 import torch.nn as nn
 from torchvision import transforms, models
 from PIL import Image
 import joblib
-import numpy as np
-import sys
+from flask import Flask, request, jsonify
 
 torch.hub.set_dir('./modelCache')
 # 定义特征提取器
@@ -19,8 +17,8 @@ class FeatureExtractor(nn.Module):
         x = torch.flatten(x, 1)
         return x
 
-# 使用预训练的ResNet18
-model = models.resnet18(pretrained=True)
+# 使用预训练的ResNet50
+model = models.resnet50(pretrained=True)
 feature_extractor = FeatureExtractor(model)
 feature_extractor.eval()
 
@@ -37,7 +35,7 @@ transform = transforms.Compose([
 ])
 
 # 加载保存的模型
-random_forest = joblib.load('model_code/best_random_forest.pkl')
+random_forest = joblib.load('best_random_forest.pkl')
 
 # print("模型加载完成")
 
@@ -53,8 +51,22 @@ def classify_image(image_path, model):
     return prediction[0]
 
 
-path=sys.argv[1]
-imagePath = "model_code/images/"+path # 测试路径
-# 使用随机森林分类器进行分类
-rf_prediction = classify_image(imagePath, random_forest)
-print(rf_prediction)
+# 创建Flask应用
+app = Flask(__name__)
+
+
+@app.route('/', methods=['POST'])
+def classify():
+    data = request.json
+    if 'imagePath' not in data:
+        return jsonify({'error': 'No imagePath provided'}), 400
+
+    imagePath = data['imagePath']
+    try:
+        prediction = classify_image(imagePath, random_forest)
+        return jsonify({'prediction': int(prediction)}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

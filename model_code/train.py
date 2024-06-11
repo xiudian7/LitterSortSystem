@@ -10,8 +10,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import joblib
 
-torch.hub.set_dir('./modelCache')
-
 # 定义数据集类
 class TrashDataset(torch.utils.data.Dataset):
     def __init__(self, txt_file, root_dir, transform=None):
@@ -67,8 +65,8 @@ class FeatureExtractor(nn.Module):
         x = torch.flatten(x, 1)
         return x
 
-# 使用预训练的ResNet18
-model = models.resnet18(pretrained=True)
+# 使用预训练的ResNet50
+model = models.resnet50(pretrained=True)
 feature_extractor = FeatureExtractor(model)
 feature_extractor.eval()
 
