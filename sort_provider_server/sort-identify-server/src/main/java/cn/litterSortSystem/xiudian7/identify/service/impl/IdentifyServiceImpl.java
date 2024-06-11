@@ -3,12 +3,16 @@ package cn.litterSortSystem.xiudian7.identify.service.impl;
 import cn.litterSortSystem.xiudian7.identify.ImageInfo;
 import cn.litterSortSystem.xiudian7.identify.mapper.IdentifyMapper;
 import cn.litterSortSystem.xiudian7.identify.service.IdentifyService;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -21,11 +25,12 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
         String substring = UUID.randomUUID().toString().substring(0, 6);
         String imagePath="D:\\CodePractice\\litter_sort_system\\model_code\\images\\"+substring+".jpg";
         takePhoto(imagePath);
-        int i = identifyResult(substring+".jpg");
+        int res=sendIdentifyMsg("images/"+substring+".jpg");
+        //int i = identifyResult(substring+".jpg");
         //数字标识：class_labels = ["glass", "paper", "cardboard", "plastic", "metal", "trash"]
         String []information={"玻璃","纸张","纸皮","塑料","金属","废料"};
-        System.out.println(information[i]);
-        return information[i];
+        System.out.println(information[res]);
+        return information[res];
     }
 
     @Override
@@ -60,7 +65,7 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
     @Override
     public void takePhoto(String filePath) {
         // 配置连接参数
-        final String ip = "192.168.16.193";
+        final String ip = "192.168.60.193";
         final int port = 4567;
         // 获取当前工作目录
         String workingDirectory = System.getProperty("user.dir");
@@ -97,6 +102,61 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
         }
     }
 
+    //使用http请求来发送验证消息,提升效率 1s左右完成
+    @Override
+    public int sendIdentifyMsg(String path) {
+        int prediction = -1;
+        try {
+
+            // 创建 URL 对象
+            URL url = new URL("http://localhost:5000");
+
+            // 打开连接
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // 设置请求方法为 POST
+            connection.setRequestMethod("POST");
+
+            // 设置请求头
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setRequestProperty("Accept", "application/json");
+
+            // 允许写入
+            connection.setDoOutput(true);
+
+            // 创建 JSON 请求体
+            String jsonInputString = String.format("{\"imagePath\": \"%s\"}", path);
+
+            // 将请求体写入到连接的输出流中
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            // 获取响应码
+            int code = connection.getResponseCode();
+            System.out.println("Response Code: " + code);
+
+            // 读取响应内容
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+            }
+
+            // 解析 JSON 响应
+            JSONObject jsonResponse = JSON.parseObject(response.toString());
+            prediction = jsonResponse.getIntValue("prediction");
+            System.out.println(prediction);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return prediction;
+    }
+
 
     public static int identifyResult(String imagePath){
         //System.out.println(imagePath);
@@ -104,7 +164,7 @@ public class IdentifyServiceImpl extends ServiceImpl<IdentifyMapper,ImageInfo>im
         Process proc;
         StringBuilder pythonOutput = new StringBuilder(); // 用于存储Python脚本的输出结果
         try {
-            String command = "D:\\CodePractice\\anaconda\\envs\\pytorch\\python.exe model_code/main.py " + imagePath;
+            String command = "D:\\CodePractice\\anaconda\\envs\\pytorch\\python.exe model_code/produce.py " + imagePath;
             proc = Runtime.getRuntime().exec(command);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));

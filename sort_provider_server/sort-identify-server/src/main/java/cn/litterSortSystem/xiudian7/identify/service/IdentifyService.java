@@ -13,4 +13,6 @@ public interface IdentifyService extends IService<ImageInfo> {
 
     //调用树莓派拍摄图片
     public void takePhoto(String filePath);
+
+    public int sendIdentifyMsg(String path);
 }
