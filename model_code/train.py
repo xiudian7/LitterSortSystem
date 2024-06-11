@@ -65,7 +65,7 @@ class FeatureExtractor(nn.Module):
         x = torch.flatten(x, 1)
         return x
 
-# 使用预训练的ResNet50
+
 model = models.resnet50(pretrained=True)
 feature_extractor = FeatureExtractor(model)
 feature_extractor.eval()
